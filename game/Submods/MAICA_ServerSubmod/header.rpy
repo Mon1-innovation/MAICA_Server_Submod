@@ -31,7 +31,7 @@ screen maica_server_setting_pane():
             action Show("maica_add_account")
         textbutton _("> 要求 MAICA Blessland 重新检测可用性"):
             action Function(store.maica.maica.accessable)
-        textbutton _("> 开机自启动"):
+        textbutton _("> 自动启动"):
             action ToggleField(persistent, "maica_sv_autostart")
 
 screen maica_add_account():
