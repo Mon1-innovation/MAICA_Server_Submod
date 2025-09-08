@@ -53,5 +53,7 @@ Illuminator compact 是 MAICA 的轻量化后端, 为方便用户本地部署的
 
 * 你需要自行部署好可用的模型后端, 并且支持openai api格式
 * 在API Keys界面输入与`MAICA Server`相关的配置
+  > 你可以在[这里](https://github.com/Mon1-innovation/MAICA/blob/main/maica/env_example)找到配置示例.
 * 在子模组界面中启动服务器, 并重新检测可用性
+* 系统Prompt位于`system_prompt.rpy`, 你可以优化prompt来提高模型的表现.
 
