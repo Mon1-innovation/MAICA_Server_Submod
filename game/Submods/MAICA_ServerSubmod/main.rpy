@@ -120,4 +120,5 @@ init -5 python:
     
 init 500 python:
     if persistent.maica_sv_autostart:
+        maica_update_key()
         maicasv.start_server()

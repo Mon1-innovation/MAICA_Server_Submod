@@ -32,7 +32,7 @@ screen maica_server_setting_pane():
         textbutton _("> 要求 MAICA Blessland 重新检测可用性"):
             action Function(store.maica.maica.accessable)
         textbutton _("> 开机自启动"):
-            action ToggleVariable("persistent.maica_sv_autostart")
+            action ToggleField(persistent, "maica_sv_autostart")
 
 screen maica_add_account():
     python:
