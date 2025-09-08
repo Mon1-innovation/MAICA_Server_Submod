@@ -113,7 +113,7 @@ class MAICAManager(object):
             env_path = os.path.join(exe_dir, '.env')
             
             try:
-                with open(env_path, 'w') as env_file:
+                with open(env_path, 'w', encoding="utf-8") as env_file:
                     for key, value in self._env_vars.items():
                         # Ensure value is a string and wrap in quotes
                         quoted_value = '"{}"'.format(str(value).replace('"', '\\"'))
