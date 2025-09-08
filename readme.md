@@ -7,7 +7,7 @@
 
 <p align="center">中文 | <a href="/README_EN.md">English</a></p>
 
-本页面是MAICA的指引页面, 当前位置是MAICA子模组前端仓库.
+本页面是MAICA的指引页面, 当前位置是MAICA后端子模组仓库.
 
 MAICA项目的详细介绍页是https://maica.monika.love/.
 
@@ -38,6 +38,8 @@ Illuminator compact 是 MAICA 的轻量化后端, 为方便用户本地部署的
 
 
 ## 安装
+
+> 本子模组仅支持Windows
 
 1. 确保使用的是最新汉化版本MAS.  
 2. 从[Release](https://github.com/Mon1-innovation/MAICA_ChatSubmod/releases)处下载最新的MAICA Blessland.    
