@@ -1,0 +1,8 @@
+.vscode/settings.json
+CLAUDE.md
+forum_flarum_db.db
+maica.db
+game/Submods/MAICA_ServerSubmod/.initialized
+game/Submods/MAICA_ServerSubmod/.env
+
+*.rpyc
