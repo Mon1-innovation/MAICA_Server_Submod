@@ -113,11 +113,24 @@ class MAICAManager(object):
             env_path = os.path.join(exe_dir, '.env')
             
             try:
-                with open(env_path, 'w', encoding="utf-8") as env_file:
+                # Py2/3 compatible file opening with UTF-8
+                import io
+                with io.open(env_path, 'w', encoding='utf-8') as env_file:
                     for key, value in self._env_vars.items():
                         # Ensure value is a string and wrap in quotes
-                        quoted_value = '"{}"'.format(str(value).replace('"', '\\"'))
-                        env_file.write('{}={}\n'.format(key, quoted_value))
+                        if sys.version_info[0] < 3:
+                            # Python 2
+                            try:
+                                quoted_value = u'"{}"'.format(unicode(str(value)).replace('"', '\\"'))
+                                env_file.write(u'{}={}\n'.format(key, quoted_value))
+                            except NameError:
+                                # Fallback for Python 2 if unicode is not defined
+                                quoted_value = '"{}"'.format(str(value).replace('"', '\\"'))
+                                env_file.write('{}={}\n'.format(key, quoted_value))
+                        else:
+                            # Python 3
+                            quoted_value = '"{}"'.format(str(value).replace('"', '\\"'))
+                            env_file.write('{}={}\n'.format(key, quoted_value))
                 self._log_info('Created .env file at {}'.format(env_path))
             except Exception as e:
                 self._log_error('Error creating .env file: {}'.format(e))
