@@ -8,7 +8,7 @@ init -990 python:
         settings_pane="maica_server_setting_pane",
         dependencies={"MAICA Blessland":("1.2.0", "1.99.99")},
     )
-
+default persistent.maica_sv_autostart = False
 screen maica_server_setting_pane(): 
     python:
         import socket
@@ -31,6 +31,8 @@ screen maica_server_setting_pane():
             action Show("maica_add_account")
         textbutton _("> 要求 MAICA Blessland 重新检测可用性"):
             action Function(store.maica.maica.accessable)
+        textbutton _("> 开机自启动"):
+            action ToggleVariable("persistent.maica_sv_autostart")
 
 screen maica_add_account():
     python:

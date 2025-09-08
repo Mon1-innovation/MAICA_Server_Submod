@@ -118,3 +118,6 @@ init -5 python:
         
         store.mas_submod_utils.getAndRunFunctions("maica_update_key")
     
+init 500 python:
+    if persistent.maica_sv_autostart:
+        maicasv.start_server()
