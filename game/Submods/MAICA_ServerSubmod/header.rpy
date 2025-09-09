@@ -87,7 +87,7 @@ screen maica_add_account():
             hbox:
                 text _("{size=-10}此处使用的邮箱不会验证合法性")
             hbox:
-                text _("{size=-10}此处输入的信息不会被自动清理, 你可以回来应用你创建的账号")
+                text _("{size=-10}此处输入的信息不会被自动清理, 以便备读")
 
 
 screen maica_server_setting():
