@@ -85,6 +85,8 @@ screen maica_add_account():
             hbox:
                 text _("{size=-10}此处的账密等信息建议仅使用英文和数字，避免使用特殊符号")
             hbox:
+                text _("{size=-10}此处使用的邮箱不会验证合法性")
+            hbox:
                 text _("{size=-10}此处输入的信息不会被自动清理, 你可以回来应用你创建的账号")
 
 
