@@ -48,6 +48,6 @@ This repository introduction is very brief. If this is your first contact with M
 * Configure other variables of `MAICA Server` through API keys section.
   > Example and explainations [here](https://github.com/Mon1-innovation/MAICA/blob/main/maica/env_example).
   > For explaination of concepts of MAICA, refer to [documents](https://github.com/Mon1-innovation/MAICA/tree/main/document).
-* Start server in Submods section, and request Blessland to reinitialize.
 * Switch Blessland's provider to local.
+* Start server in Submods section, and request Blessland to reinitialize.
 * System prompt of core model is at `system_prompt.rpy`. Consider tweakering if your model wasn't trained according to MAICA standard.
