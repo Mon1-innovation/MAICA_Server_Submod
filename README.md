@@ -48,6 +48,6 @@ Illuminator(幻象引擎) compact 是 MAICA 的轻量化后端, 该仓库为方�
 * 在API Keys界面输入与`MAICA Server`相关的配置.
   > 你可以在[这里](https://github.com/Mon1-innovation/MAICA/blob/main/maica/env_example)找到配置示例.
   > 关于MAICA的各方面概念, 参见[文档](https://github.com/Mon1-innovation/MAICA/tree/main/document).
-* 在子模组界面中启动服务器, 并重新检测可用性.
 * 将MAICA Blessland的服务节点切换为本地节点.
+* 在子模组界面中启动服务器, 并重新检测可用性.
 * 系统Prompt位于`system_prompt.rpy`. 若你使用的模型未经过MAICA标准训练, 可以考虑自行调整.
