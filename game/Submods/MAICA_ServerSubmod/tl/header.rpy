@@ -74,3 +74,6 @@ translate english strings:
     old "{size=-10}此处输入的信息不会被自动清理, 以便备读"
     new "{size=-10}Inputs here will not be flushed for convenience"
 
+    old "警告: 你未切换至 MAICA Illuminator compact 节点!"
+    new "Warning: You are not on the MAICA Illuminator compact node!"
+

@@ -22,6 +22,12 @@ screen maica_server_setting_pane():
         xmaximum 800
         xfill True
         style_prefix "check"
+
+        if store.maica.maica.provider_id != 9999:
+            text _("警告: 你未切换至 MAICA Illuminator compact 节点!"):
+                xalign 1.0 yalign 0.0
+                xoffset -10
+                style "main_menu_version"
         textbutton _("> 启动服务器"):
             action [Function(maica_update_key),
             Function(maicasv.start_server)]
