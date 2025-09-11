@@ -8,6 +8,15 @@ init -990 python:
         settings_pane="maica_server_setting_pane",
         dependencies={"MAICA Blessland":("1.3.0", "1.99.99")},
     )
+init -989 python:
+    if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
+        store.sup_utils.SubmodUpdater(
+            submod="MAICA Illuminator compact",
+            user_name="Mon1-innovation",
+            repository_name="MAICA_Server_Submod",
+            update_dir="",
+            attachment_id=None
+        )
 default persistent.maica_sv_autostart = False
 screen maica_server_setting_pane(): 
     python:
