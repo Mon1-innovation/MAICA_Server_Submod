@@ -115,7 +115,7 @@ init -5 python:
         maicasv.set_env('MCORE_NODE', 'HGX690-nuclear-edition')
         maicasv.set_env('MFOCUS_NODE', 'HGX610-biohazard-edition')
         maicasv.set_env('ALT_TOOLCALL', '1')
-        
+        maicasv.set_env('IS_REAL_ENV', '1')
         store.mas_submod_utils.getAndRunFunctions("maica_update_key")
     
 init 500 python:
