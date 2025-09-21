@@ -72,6 +72,7 @@ init -5 python:
     )
     def maica_update_key():
         # Core URL and key from registered API keys
+        maicasv.set_env('CURR_VERSION', '1.1.003')
         maicasv.set_env('MCORE_ADDR', mas_getAPIKey("maica_core_url") or '')
         maicasv.set_env('MCORE_KEY', mas_getAPIKey("maica_core_key") or '')
         maicasv.set_env('MCORE_CHOICE', mas_getAPIKey("maica_core_model") or '')
@@ -88,7 +89,8 @@ init -5 python:
         
         # Proxy address from registered API keys
         maicasv.set_env('PROXY_ADDR', mas_getAPIKey("maica_proxy_addr") or '')
-        
+        #SESSION_MAX_TOKEN = '28672'
+        maicasv.set_env('SESSION_MAX_TOKEN', '28672')
         # Database and other configuration settings
         maicasv.set_env('DB_ADDR', 'sqlite')
         maicasv.set_env('DB_USER', 'user')
@@ -110,12 +112,42 @@ init -5 python:
         # Developer and system info
         maicasv.set_env('DEV_IDENTITY', 'Evan & Clifford')
         maicasv.set_env('DEV_STATUS', 'serving')
-        maicasv.set_env('VERSION_CONTROL', '1.1000;1.1000')
+        maicasv.set_env('VERSION_CONTROL', '1.1.000')
         maicasv.set_env('SESSION_MAX_TOKEN', '28672')
         maicasv.set_env('MCORE_NODE', 'HGX690-nuclear-edition')
         maicasv.set_env('MFOCUS_NODE', 'HGX610-biohazard-edition')
         maicasv.set_env('ALT_TOOLCALL', '1')
         maicasv.set_env('IS_REAL_ENV', '1')
+        
+        MCORE_EXTRA = """\
+    {
+        "extra_body": {
+            "repetition_penalty": 1.0,
+            "length_penalty": 1.0
+        }
+    }"""
+        maicasv.set_env('MCORE_EXTRA', MCORE_EXTRA)
+
+        MFOCUS_EXTRA = """\
+        {
+            "temperature": 0.2,
+            "seed": 42,
+            "extra_body": {
+                "repetition_penalty": 1.05,
+                "length_penalty": 1.1
+            }
+        }"""
+        maicasv.set_env('MFOCUS_EXTRA', MFOCUS_EXTRA)
+
+        SERVERS_LIST = """\
+            {
+                "isMaicaNameServer": true,
+                "servers": [
+                    {"id": 0, "name": "Local MAICA Instance", "description": "Used for conveniently connecting to a local deployed MAICA instance", "isOfficial": true, "portalPage":"http://127.0.0.1", "servingModel": "UNKNOWN", "modelLink": "UNKNOWN", "wsInterface": "ws://127.0.0.1:5000", "httpInterface": "http://127.0.0.1:6000", "isFullRestful": true}
+                ]
+            }
+        """
+        maicasv.set_env('SERVERS_LIST', SERVERS_LIST)
         store.mas_submod_utils.getAndRunFunctions("maica_update_key")
     
 init 500 python:
