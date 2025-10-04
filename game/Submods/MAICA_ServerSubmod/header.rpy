@@ -1,5 +1,5 @@
 init -990 python:
-    maica_sv_ver = "1.0.6"
+    maica_sv_ver = "1.0.7"
     store.mas_submod_utils.Submod(
         author="P",
         name="MAICA Illuminator compact",
@@ -15,7 +15,7 @@ init -989 python:
             user_name="Mon1-innovation",
             repository_name="MAICA_Server_Submod",
             update_dir="",
-            attachment_id=None
+            attachment_id=0
         )
 default persistent.maica_sv_autostart = False
 screen maica_server_setting_pane(): 
