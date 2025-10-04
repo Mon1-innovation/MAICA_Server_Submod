@@ -46,10 +46,6 @@ translate english strings:
     old "请输入账号用户名"
     new "Enter account username here"
 
-    # game/Submods/MAICA_ServerSubmod/header.rpy:66
-    old "输入密码"
-    new "Enter password"
-
     # game/Submods/MAICA_ServerSubmod/header.rpy:67
     old "请输入账号密码"
     new "Enter account password here"
