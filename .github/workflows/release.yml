@@ -1,0 +1,60 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (will be automatically extracted from header.rpy if not specified)'
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+
+    - name: Extract version from header.rpy
+      id: get_version
+      run: |
+        version=$(grep 'maica_sv_ver = ' game/Submods/MAICA_ServerSubmod/header.rpy | cut -d'"' -f2)
+        echo "Extracted version: $version"
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: Use provided or extracted version
+      id: set_version
+      run: |
+        version="${{ github.event.inputs.version }}"
+        if [ -z "$version" ]; then
+          version="${{ steps.get_version.outputs.version }}"
+        fi
+        echo "Using version: $version"
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: Prepare release assets
+      run: |
+        # Download assets from MAICA repository
+        mkdir -p game/Submods/MAICA_ServerSubmod
+
+        # Download specific assets
+        wget -O game/Submods/MAICA_ServerSubmod/env_example https://github.com/PencilMario/MAICA/releases/latest/download/env_example
+        wget -O game/Submods/MAICA_ServerSubmod/Register.exe https://github.com/PencilMario/MAICA/releases/latest/download/Register.exe
+        wget -O game/Submods/MAICA_ServerSubmod/maica_starter.exe https://github.com/PencilMario/MAICA/releases/latest/download/maica_starter.exe
+
+    - name: Create zip package
+      run: |
+        zip -r MAICA_Server_Submod-${{ steps.set_version.outputs.version }}.zip .
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.set_version.outputs.version }}
+        files: |
+          MAICA_Server_Submod-${{ steps.set_version.outputs.version }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
