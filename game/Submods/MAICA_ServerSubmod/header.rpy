@@ -64,45 +64,37 @@ screen maica_add_account():
 
     style_prefix "confirm"
 
-    frame:
-        vbox:
-            xfill False
-            yfill False
-            spacing 5                        
+    use maica_setter_medium_frame(cancel_action=Hide("maica_add_account")):
 
-                    
-            hbox:
-                textbutton _("输入邮箱"):
-                    action Show("maica_login_input",message = _("请输入账号邮箱"),returnto = "_maica_LoginEmail")
-            hbox:
-                textbutton _("输入用户名"):
-                    action Show("maica_login_input",message = _("请输入账号用户名") ,returnto = "_maica_LoginAcc")
-            hbox:
-                textbutton _("输入密码"):
-                    action Show("maica_login_input",message = _("请输入账号密码"),returnto = "_maica_LoginPw")
-            hbox:
-                text ""
-            hbox:
-                textbutton _("创建账号"):
-                    action [
-                        Function(maica_user_registration.register_user, store._maica_LoginAcc, store._maica_LoginEmail, store._maica_LoginPw, db_path),
+        hbox:
+            textbutton _("输入邮箱"):
+                action Show("maica_login_input",message = _("请输入账号邮箱"),returnto = "_maica_LoginEmail")
+        hbox:
+            textbutton _("输入用户名"):
+                action Show("maica_login_input",message = _("请输入账号用户名") ,returnto = "_maica_LoginAcc")
+        hbox:
+            textbutton _("输入密码"):
+                action Show("maica_login_input",message = _("请输入账号密码"),returnto = "_maica_LoginPw")
+        hbox:
+            text ""
+        hbox:
+            textbutton _("创建账号"):
+                action [
+                    Function(maica_user_registration.register_user, store._maica_LoginAcc, store._maica_LoginEmail, store._maica_LoginPw, db_path),
+                ]
+            textbutton _("在 MAICA Blessland 中应用（须提前开启服务器）"):
+                action [
+                    Function(store.maica.maica.accessable),
+                    Function(store.maica.maica._gen_token, store._maica_LoginAcc, store._maica_LoginPw, "", store._maica_LoginEmail if store._maica_LoginEmail != "" else None),
+                    Function(_maica_verify_token),
+                    Function(maica_clear),
                     ]
-                textbutton _("在 MAICA Blessland 中应用（须提前开启服务器）"):
-                    action [
-                        Function(store.maica.maica.accessable),
-                        Function(store.maica.maica._gen_token, store._maica_LoginAcc, store._maica_LoginPw, "", store._maica_LoginEmail if store._maica_LoginEmail != "" else None),
-                        Function(_maica_verify_token),
-                        Function(maica_clear),
-                        ]
-
-                textbutton _("关闭"):
-                    action [Hide("maica_add_account")]
-            hbox:
-                text _("{size=-10}此处的账密等信息建议仅使用英文和数字，避免使用特殊符号")
-            hbox:
-                text _("{size=-10}此处使用的邮箱不会验证合法性")
-            hbox:
-                text _("{size=-10}此处输入的信息不会被自动清理, 以便备读")
+        hbox:
+            text _("{size=-10}此处的账密等信息建议仅使用英文和数字，避免使用特殊符号")
+        hbox:
+            text _("{size=-10}此处使用的邮箱不会验证合法性")
+        hbox:
+            text _("{size=-10}此处输入的信息不会被自动清理, 以便备读")
 
 
 screen maica_server_setting():
@@ -118,28 +110,20 @@ screen maica_server_setting():
     
     style_prefix "check"
 
-    frame:
-        vbox:
-            xmaximum 1100
-            spacing 5
-            viewport:
-                id "viewport"
-                scrollbars "vertical"
-                ymaximum 600
-                xmaximum 1100
-                xfill True
-                yfill False
-                mousewheel True
-                draggable True
+    $ w = 1100
+    $ h = 640
+    $ x = 0.5
+    $ y = 0.5
+
+    use maica_common_outer_frame(w, h, x, y):
+
+        use maica_common_inner_frame(w, h, x, y):
                 
-                vbox:
-                    xmaximum 1100
-                    xfill True
-                    yfill False
-                    hbox:
-                        text "text"
+
+            hbox:
+                text "text"
                 
-                    hbox:
-                        style_prefix "confirm"
-                        textbutton _("关闭"):
-                            action Hide("maica_server_setting")
+        hbox:
+            style_prefix "confirm"
+            textbutton _("关闭"):
+                action Hide("maica_server_setting")
