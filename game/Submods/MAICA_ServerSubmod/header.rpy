@@ -32,6 +32,7 @@ screen maica_server_setting_pane():
         xfill True
         style_prefix "check"
 
+        use intro_tooltip()
         if store.maica.maica.provider_id != 9999:
             text _("警告: 你未切换至 MAICA Illuminator compact 节点!"):
                 xalign 1.0 yalign 0.0
@@ -60,7 +61,7 @@ screen maica_add_account():
             store.mas_api_keys.api_keys.update({"Maica_Token":store.maica.maica.ciphertext})
             store.mas_api_keys.save_keys()
     modal True
-    zorder 215
+    zorder 92
 
     style_prefix "confirm"
 
@@ -98,15 +99,19 @@ screen maica_add_account():
 
 
 screen maica_server_setting():
+
+    default tooltip = Tooltip("")
+
     python:
-        submods_screen = store.renpy.get_screen("submods", "screens")
+        submods_screen = store.renpy.get_screen("maica_setting", "screens")
 
         if submods_screen:
-            _tooltip = submods_screen.scope.get("tooltip", None)
+            store._tooltip = submods_screen.scope.get("tooltip", None)
         else:
-            _tooltip = None
+            store._tooltip = None
+
     modal True
-    zorder 215
+    zorder 90
     
     style_prefix "check"
 
@@ -127,3 +132,10 @@ screen maica_server_setting():
             style_prefix "confirm"
             textbutton _("关闭"):
                 action Hide("maica_server_setting")
+                
+    if tooltip.value:
+        frame:
+            xalign 0.5 yalign 1.0
+            yoffset -25
+            text tooltip.value:
+                style "main_menu_version"
