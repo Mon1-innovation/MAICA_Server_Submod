@@ -63,7 +63,7 @@ jobs:
         mkdir -p game/Submods/MAICA_ServerSubmod/bin
 
         # Download MAICA assets
-        wget -O game/Submods/MAICA_ServerSubmod/env_example https://github.com/PencilMario/MAICA/releases/latest/download/env_example
+        wget -O game/Submods/MAICA_ServerSubmod/env_basis https://github.com/PencilMario/MAICA/releases/latest/download/env_basis
         wget -O game/Submods/MAICA_ServerSubmod/Register.exe https://github.com/PencilMario/MAICA/releases/latest/download/Register.exe
         wget -O game/Submods/MAICA_ServerSubmod/maica_starter.exe https://github.com/PencilMario/MAICA/releases/latest/download/maica_starter.exe
 
