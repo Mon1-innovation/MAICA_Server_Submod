@@ -106,6 +106,8 @@ class MAICAManager(object):
 
             self._log_info('Environment Variables:')
             for key, value in self._env_vars.items():
+                if 'key' in key.lower():
+                    self._log_info('{0}: {1} (type: {2})'.format(key, '[Filtered]', type(value).__name__))
                 self._log_info('{0}: {1} (type: {2})'.format(key, value, type(value).__name__))
 
             # Create .env file in the same directory as executable
