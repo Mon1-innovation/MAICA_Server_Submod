@@ -63,12 +63,61 @@ init -5 python:
         on_change=change_maica_proxy_addr
     )
 
-    def change_maica_gaode_key(param):
+    def change_maica_tp_apis(param):
         return True, param
     store.mas_registerAPIKey(
-        "maica_gaode_key",
-        renpy.substitute(_("MAICA Server 高德天气KEY")),
-        on_change=change_maica_gaode_key
+        "maica_tp_apis",
+        renpy.substitute(_("MAICA Server 第三方API配置")),
+        on_change=change_maica_tp_apis
+    )
+
+    def change_maica_mvista_addr(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mvista_addr",
+        renpy.substitute(_("MAICA Server MVista服务商url")),
+        on_change=change_maica_mvista_addr
+    )
+
+    def change_maica_mvista_key(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mvista_key",
+        renpy.substitute(_("MAICA Server MVista服务商api key")),
+        on_change=change_maica_mvista_key
+    )
+
+    def change_maica_mvista_choice(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mvista_choice",
+        renpy.substitute(_("MAICA Server MVista模型名称")),
+        on_change=change_maica_mvista_choice
+    )
+
+
+    def change_maica_mnerve_addr(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mnerve_addr",
+        renpy.substitute(_("MAICA Server MNerve服务商url")),
+        on_change=change_maica_mnerve_addr
+    )
+
+    def change_maica_mnerve_key(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mnerve_key",
+        renpy.substitute(_("MAICA Server MNerve服务商api key")),
+        on_change=change_maica_mnerve_key
+    )
+
+    def change_maica_mnerve_choice(param):
+        return True, param
+    store.mas_registerAPIKey(
+        "maica_mnerve_choice",
+        renpy.substitute(_("MAICA Server MNerve模型名称")),
+        on_change=change_maica_mnerve_choice
     )
 
     def maica_update_key():
@@ -82,10 +131,16 @@ init -5 python:
         maicasv.set_env('MAICA_MFOCUS_KEY', mas_getAPIKey("maica_mfocus_key") or '')
         maicasv.set_env('MAICA_MFOCUS_CHOICE', mas_getAPIKey("maica_mfocus_model") or '')
 
-        # Other service keys from registered API keys
-        #maicasv.set_env('MAICA_MVISTA_ADDR', '')
-        #maicasv.set_env('MAICA_MVISTA_KEY', 'EMPTY')
-        #maicasv.set_env('MAICA_MVISTA_CHOICE', '')
+        # MVista URL and key from registered API keys
+        maicasv.set_env('MAICA_MVISTA_ADDR', mas_getAPIKey("maica_mvista_addr") or '')
+        maicasv.set_env('MAICA_MVISTA_KEY', mas_getAPIKey("maica_mvista_key") or '')
+        maicasv.set_env('MAICA_MVISTA_CHOICE', mas_getAPIKey("maica_mvista_choice") or '')
+        # maicasv.set_env('MAICA_MVISTA_EXTRA', mas_getAPIKey("maica_mvista_extra") or '{\n        "extra_body": {\n        }\n    }')
+
+        # MNerve URL and key from registered API keys
+        maicasv.set_env('MAICA_MNERVE_ADDR', mas_getAPIKey("maica_mnerve_addr") or '')
+        maicasv.set_env('MAICA_MNERVE_KEY', mas_getAPIKey("maica_mnerve_key") or '')
+        maicasv.set_env('MAICA_MNERVE_CHOICE', mas_getAPIKey("maica_mnerve_choice") or '')
 
         # Proxy address from registered API keys
         maicasv.set_env('MAICA_PROXY_ADDR', mas_getAPIKey("maica_proxy_addr") or '')
@@ -98,8 +153,8 @@ init -5 python:
         maicasv.set_env('MAICA_AUTH_DB', 'forum_flarum_db.db')
         maicasv.set_env('MAICA_DATA_DB', 'maica.db')
 
-        # Weather key from registered API keys
-        maicasv.set_env('MAICA_WEATHER_KEY', mas_getAPIKey("maica_gaode_key") or '')
+        # Third-party APIs from registered API keys
+        maicasv.set_env('MAICA_TP_APIS', mas_getAPIKey("maica_tp_apis") or '{\n        "GAODE_WEATHER": ""\n    }')
 
         # Connection and performance settings
         maicasv.set_env('MAICA_KICK_STALE_CONNS', '1')
