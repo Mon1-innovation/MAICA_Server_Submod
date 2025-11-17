@@ -54,7 +54,7 @@ screen maica_add_account():
     python:
         import maica_user_registration
         maica_user_registration.logger = store.mas_submod_utils.submod_log
-        maica_user_registration.path = os.path.join(renpy.config.basedir, "game", "Submods", "MAICA_ServerSubmod", "Register.exe")
+        maica_user_registration.path = os.path.join(renpy.config.basedir, "game", "Submods", "MAICA_ServerSubmod", "create_account.exe")
         db_path = os.path.join(renpy.config.basedir, "game", "Submods", "MAICA_ServerSubmod", "forum_flarum_db.db") 
 
         def maica_clear():

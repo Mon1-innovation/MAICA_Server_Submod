@@ -1,14 +1,14 @@
 import os
 import sys
 import logging
-path = r"E:\GithubKu\MAICA_Server_Submod\game\Submods\MAICA_ServerSubmod\Register.exe"
+path = r"E:\GithubKu\MAICA_Server_Submod\game\Submods\MAICA_ServerSubmod\create_account.exe"
 logger=None
 def register_user(username, email, password, db_path=None):
     global logger
     if logger is None:
         logger = logging.getLogger(__name__)
     """
-    Register a user by calling the Register.exe with provided credentials.
+    Register a user by calling the create_account.exe with provided credentials.
     
     :param username: User's username
     :param email: User's email address
@@ -30,7 +30,7 @@ def register_user(username, email, password, db_path=None):
     try:
         # Construct command string with proper escaping
         cmd_str = "{} --username \"{}\" --email \"{}\" --password \"{}\" ".format(path, username, email, password) + "--db \"{}\"".format(db_path) if db_path else ""
-        logger.info("Executing Register.exe with args: {}".format(cmd_str))
+        logger.info("Executing create_account.exe with args: {}".format(cmd_str))
         # Use os.system to execute the command
         result = os.system(cmd_str)
         
@@ -43,7 +43,7 @@ def register_user(username, email, password, db_path=None):
             return False
     
     except Exception as e:
-        logger.error("Error executing Register.exe: {}".format(e))
+        logger.error("Error executing create_account.exe: {}".format(e))
         return False
 
 # Example usage
