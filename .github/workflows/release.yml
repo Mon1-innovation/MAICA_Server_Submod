@@ -70,6 +70,13 @@ jobs:
         # Download mi-search Windows binary
         wget -O game/Submods/MAICA_ServerSubmod/bin/mi-serp-precompiled-binary-win.exe https://github.com/edgeinfinity1/mi-search-mcp/releases/latest/download/mi-serp-precompiled-binary-win.exe
 
+    - name: Extract backend version
+      if: steps.check_release.outputs.create_release == 'true'
+      id: backend_version
+      run: |
+        backend_ver=$(grep "MAICA_CURR_VERSION = " game/Submods/MAICA_ServerSubmod/env_basis | cut -d"'" -f2)
+        echo "backend_version=$backend_ver" >> $GITHUB_OUTPUT
+
     - name: Create zip package
       if: steps.check_release.outputs.create_release == 'true'
       run: |
@@ -83,6 +90,9 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.set_version.outputs.version }}
+        body: |
+          ## Backend Version
+          This release uses backend version: **${{ steps.backend_version.outputs.backend_version }}**
         files: |
           MAICA_Server_Submod-${{ steps.set_version.outputs.version }}.zip
       env:
