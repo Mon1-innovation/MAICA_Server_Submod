@@ -33,7 +33,7 @@ screen maica_server_setting_pane():
         style_prefix "check"
 
         use intro_tooltip()
-        if store.maica.maica.provider_id != 9999:
+        if store.maica.maica_instance.provider_id != 9999:
             text _("警告: 你未切换至 MAICA Illuminator compact 节点!"):
                 xalign 1.0 yalign 0.0
                 xoffset -10
@@ -46,7 +46,7 @@ screen maica_server_setting_pane():
         textbutton _("> 添加账号"):
             action Show("maica_add_account")
         textbutton _("> 要求 MAICA Blessland 重新检测可用性"):
-            action Function(store.maica.maica.accessable)
+            action Function(store.maica.maica_instance.accessable)
         textbutton _("> 自动启动"):
             action ToggleField(persistent, "maica_sv_autostart")
 
@@ -58,7 +58,7 @@ screen maica_add_account():
         db_path = os.path.join(renpy.config.basedir, "game", "Submods", "MAICA_ServerSubmod", "forum_flarum_db.db") 
 
         def maica_clear():
-            store.mas_api_keys.api_keys.update({"Maica_Token":store.maica.maica.ciphertext})
+            store.mas_api_keys.api_keys.update({"Maica_Token":store.maica.maica_instance.ciphertext})
             store.mas_api_keys.save_keys()
     modal True
     zorder 92
@@ -85,8 +85,8 @@ screen maica_add_account():
                 ]
             textbutton _("在 MAICA Blessland 中应用（须提前开启服务器）"):
                 action [
-                    Function(store.maica.maica.accessable),
-                    Function(store.maica.maica._gen_token, store._maica_LoginAcc, store._maica_LoginPw, "", store._maica_LoginEmail if store._maica_LoginEmail != "" else None),
+                    Function(store.maica.maica_instance.accessable),
+                    Function(store.maica.maica_instance._gen_token, store._maica_LoginAcc, store._maica_LoginPw, "", store._maica_LoginEmail if store._maica_LoginEmail != "" else None),
                     Function(_maica_verify_token),
                     Function(maica_clear),
                     ]
