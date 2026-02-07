@@ -73,3 +73,6 @@ translate english strings:
     old "警告: 你未切换至 MAICA Illuminator compact 节点!"
     new "Warning: You are not on the MAICA Illuminator compact node!"
 
+    old "由 MAICA Illuminator compact 提供的节点"
+    new "Nodes from MAICA Illuminator compact"
+

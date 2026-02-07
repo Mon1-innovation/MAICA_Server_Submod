@@ -20,10 +20,11 @@ init -989 python:
 default persistent.maica_sv_autostart = False
 screen maica_server_setting_pane(): 
     python:
-        import socket
-        MaicaProviderManager.fakelocalprovider.update({
+        import socket,maica_provider_manager
+        maica_provider_manager.MaicaProviderManager._fakelocalprovider.update({
             "name":renpy.substitute(_("MAICA Illuminator compact 本地部署")),
             "deviceName": socket.gethostname(),
+            "description": renpy.substitute(_("由 MAICA Illuminator compact 提供的节点"))
             "portalPage": "https://github.com/Mon1-innovation/MAICA_Server_Submod",
             "servingModel": mas_getAPIKey("maica_core_model"),
         })
