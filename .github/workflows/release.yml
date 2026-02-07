@@ -85,6 +85,29 @@ jobs:
           -x '.github*' \
           -x '*.git*'
 
+    - name: Download MAICA_ChatSubmod latest release
+      if: steps.check_release.outputs.create_release == 'true'
+      run: |
+        # Get the latest release info from MAICA_ChatSubmod
+        release_info=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/Mon1-innovation/MAICA_ChatSubmod/releases/latest)
+
+        # Extract the download URL and filename for MAICA_ChatSubmod-*.zip
+        download_url=$(echo "$release_info" | grep -o '"browser_download_url": "[^"]*MAICA_ChatSubmod-[^"]*\.zip"' | head -1 | cut -d'"' -f4)
+        filename=$(basename "$download_url")
+
+        if [ -z "$download_url" ]; then
+          echo "Warning: Could not find MAICA_ChatSubmod release zip file"
+          exit 0
+        fi
+
+        echo "Downloading from: $download_url"
+        wget -O "$filename" "$download_url"
+
+        if [ -f "$filename" ]; then
+          echo "Successfully downloaded MAICA_ChatSubmod release: $filename"
+        fi
+
     - name: Create Release
       if: steps.check_release.outputs.create_release == 'true'
       uses: softprops/action-gh-release@v1
@@ -95,6 +118,7 @@ jobs:
           This release uses backend version: **${{ steps.backend_version.outputs.backend_version }}**
         files: |
           MAICA_Server_Submod-${{ steps.set_version.outputs.version }}.zip
+          MAICA_ChatSubmod-*.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
