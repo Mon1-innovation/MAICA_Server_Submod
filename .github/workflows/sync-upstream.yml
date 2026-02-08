@@ -15,6 +15,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
     - name: Get latest MAICA release
       id: get_maica_release
       env:
@@ -60,27 +65,86 @@ jobs:
       if: steps.should_update.outputs.update_needed == 'true'
       id: version_update
       run: |
-        current_ver=$(grep 'maica_sv_ver = ' game/Submods/MAICA_ServerSubmod/header.rpy | cut -d'"' -f2)
-        echo "Current version: $current_ver"
+        python3 << 'EOF'
+        import re
+        import os
+        from packaging.version import Version
 
-        major=$(echo $current_ver | cut -d. -f1)
-        minor=$(echo $current_ver | cut -d. -f2)
-        patch=$(echo $current_ver | cut -d. -f3)
+        header_file = "game/Submods/MAICA_ServerSubmod/header.rpy"
 
-        new_patch=$((patch + 1))
-        new_ver="$major.$minor.$new_patch"
+        # Extract current version from header.rpy
+        with open(header_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+            match = re.search(r'maica_sv_ver = "([^"]+)"', content)
+            if not match:
+                raise ValueError("Could not find maica_sv_ver in header.rpy")
+            current_ver = match.group(1)
 
-        echo "New version: $new_ver"
-        echo "current_ver=$current_ver" >> $GITHUB_OUTPUT
-        echo "new_ver=$new_ver" >> $GITHUB_OUTPUT
+        print(f"Current version: {current_ver}")
+
+        # Parse version using packaging library
+        try:
+            parsed = Version(current_ver)
+        except Exception as e:
+            raise ValueError(f"Invalid version format: {current_ver}") from e
+
+        # Increment patch version
+        new_patch = parsed.micro + 1
+        new_ver = f"{parsed.major}.{parsed.minor}.{new_patch}"
+
+        print(f"New version: {new_ver}")
+
+        # Validate new version
+        try:
+            Version(new_ver)
+        except Exception as e:
+            raise ValueError(f"Generated invalid version: {new_ver}") from e
+
+        # Output to GitHub Actions
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"current_ver={current_ver}\n")
+            f.write(f"new_ver={new_ver}\n")
+
+        print("Version extraction and increment successful")
+        EOF
 
     - name: Update header.rpy
       if: steps.should_update.outputs.update_needed == 'true'
       run: |
-        current_ver="${{ steps.version_update.outputs.current_ver }}"
-        new_ver="${{ steps.version_update.outputs.new_ver }}"
-        sed -i "s/maica_sv_ver = \"$current_ver\"/maica_sv_ver = \"$new_ver\"/" game/Submods/MAICA_ServerSubmod/header.rpy
-        echo "Updated maica_sv_ver from $current_ver to $new_ver"
+        python3 << 'EOF'
+        import re
+
+        current_ver = "${{ steps.version_update.outputs.current_ver }}"
+        new_ver = "${{ steps.version_update.outputs.new_ver }}"
+        header_file = "game/Submods/MAICA_ServerSubmod/header.rpy"
+
+        # Read file
+        with open(header_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Replace version using regex
+        new_content = re.sub(
+            rf'maica_sv_ver = "{re.escape(current_ver)}"',
+            f'maica_sv_ver = "{new_ver}"',
+            content
+        )
+
+        if new_content == content:
+            raise ValueError(f"Failed to update version: pattern not found")
+
+        # Write file
+        with open(header_file, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+
+        # Verify replacement
+        with open(header_file, 'r', encoding='utf-8') as f:
+            updated_content = f.read()
+            if f'maica_sv_ver = "{new_ver}"' not in updated_content:
+                raise ValueError("Version verification failed")
+
+        print(f"Successfully updated maica_sv_ver from {current_ver} to {new_ver}")
+        print("Version verification passed")
+        EOF
 
     - name: Update tracking file
       if: steps.should_update.outputs.update_needed == 'true'
