@@ -77,6 +77,19 @@ jobs:
         backend_ver=$(grep "MAICA_CURR_VERSION = " game/Submods/MAICA_ServerSubmod/env_basis | cut -d"'" -f2)
         echo "backend_version=$backend_ver" >> $GITHUB_OUTPUT
 
+    - name: Get latest commits
+      if: steps.check_release.outputs.create_release == 'true'
+      id: commits
+      run: |
+        # Get the last 10 commits with their messages
+        git log --oneline -10 > /tmp/commits.txt
+        # Read and properly escape for GitHub Actions output
+        {
+          echo "commits<<EOF"
+          cat /tmp/commits.txt
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
+
     - name: Create zip package
       if: steps.check_release.outputs.create_release == 'true'
       run: |
@@ -116,6 +129,11 @@ jobs:
         body: |
           ## Backend Version
           This release uses backend version: **${{ steps.backend_version.outputs.backend_version }}**
+
+          ## Latest Commits
+          ```
+          ${{ steps.commits.outputs.commits }}
+          ```
         files: |
           MAICA_Server_Submod-${{ steps.set_version.outputs.version }}.zip
           MAICA_ChatSubmod-*.zip
