@@ -20,6 +20,10 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Install Python dependencies
+      run: |
+        pip install packaging
+
     - name: Get latest MAICA release
       id: get_maica_release
       env:
