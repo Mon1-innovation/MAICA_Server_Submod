@@ -166,6 +166,13 @@ jobs:
         git commit -m "chore: sync upstream MAICA release $latest_tag - Update maica_sv_ver to $new_ver"
         git push origin main
 
+    - name: Trigger release workflow
+      if: steps.should_update.outputs.update_needed == 'true'
+      run: |
+        gh workflow run release.yml --ref main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Skip if no update needed
       if: steps.should_update.outputs.update_needed == 'false'
       run: |
