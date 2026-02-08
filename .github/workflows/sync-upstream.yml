@@ -1,0 +1,108 @@
+name: Sync Upstream MAICA Release
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  repository_dispatch:
+    types: [sync-maica-release]
+  workflow_dispatch:
+
+jobs:
+  sync-maica-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Get latest MAICA release
+      id: get_maica_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        release_info=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/PencilMario/MAICA/releases/latest)
+        latest_tag=$(echo "$release_info" | grep -o '"tag_name": "[^"]*"' | head -1 | cut -d'"' -f4)
+        if [ -z "$latest_tag" ]; then
+          echo "Error: Could not fetch latest MAICA release"
+          exit 1
+        fi
+        echo "Latest MAICA release: $latest_tag"
+        echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+
+    - name: Check if already synced
+      id: check_sync
+      run: |
+        if [ -f ".github/last-synced-maica-version" ]; then
+          last_synced=$(cat .github/last-synced-maica-version)
+          echo "Last synced version: $last_synced"
+          echo "last_synced=$last_synced" >> $GITHUB_OUTPUT
+        else
+          echo "No previous sync found"
+          echo "last_synced=" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Determine if update needed
+      id: should_update
+      run: |
+        latest_tag="${{ steps.get_maica_release.outputs.latest_tag }}"
+        last_synced="${{ steps.check_sync.outputs.last_synced }}"
+        if [ "$latest_tag" = "$last_synced" ]; then
+          echo "Already synced with this version"
+          echo "update_needed=false" >> $GITHUB_OUTPUT
+        else
+          echo "New version detected, update needed"
+          echo "update_needed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Extract and update version
+      if: steps.should_update.outputs.update_needed == 'true'
+      id: version_update
+      run: |
+        current_ver=$(grep 'maica_sv_ver = ' game/Submods/MAICA_ServerSubmod/header.rpy | cut -d'"' -f2)
+        echo "Current version: $current_ver"
+
+        major=$(echo $current_ver | cut -d. -f1)
+        minor=$(echo $current_ver | cut -d. -f2)
+        patch=$(echo $current_ver | cut -d. -f3)
+
+        new_patch=$((patch + 1))
+        new_ver="$major.$minor.$new_patch"
+
+        echo "New version: $new_ver"
+        echo "current_ver=$current_ver" >> $GITHUB_OUTPUT
+        echo "new_ver=$new_ver" >> $GITHUB_OUTPUT
+
+    - name: Update header.rpy
+      if: steps.should_update.outputs.update_needed == 'true'
+      run: |
+        current_ver="${{ steps.version_update.outputs.current_ver }}"
+        new_ver="${{ steps.version_update.outputs.new_ver }}"
+        sed -i "s/maica_sv_ver = \"$current_ver\"/maica_sv_ver = \"$new_ver\"/" game/Submods/MAICA_ServerSubmod/header.rpy
+        echo "Updated maica_sv_ver from $current_ver to $new_ver"
+
+    - name: Update tracking file
+      if: steps.should_update.outputs.update_needed == 'true'
+      run: |
+        latest_tag="${{ steps.get_maica_release.outputs.latest_tag }}"
+        echo "$latest_tag" > .github/last-synced-maica-version
+        echo "Updated last-synced-maica-version to $latest_tag"
+
+    - name: Commit and push changes
+      if: steps.should_update.outputs.update_needed == 'true'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        new_ver="${{ steps.version_update.outputs.new_ver }}"
+        latest_tag="${{ steps.get_maica_release.outputs.latest_tag }}"
+
+        git add game/Submods/MAICA_ServerSubmod/header.rpy .github/last-synced-maica-version
+        git commit -m "chore: sync upstream MAICA release $latest_tag - Update maica_sv_ver to $new_ver"
+        git push origin main
+
+    - name: Skip if no update needed
+      if: steps.should_update.outputs.update_needed == 'false'
+      run: |
+        echo "No new MAICA release detected. Skipping update."
