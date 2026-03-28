@@ -1,12 +1,12 @@
 init -990 python:
-    maica_sv_ver = "1.3.7"
+    maica_sv_ver = "1.4.0"
     store.mas_submod_utils.Submod(
         author="P",
         name="MAICA Illuminator compact",
         description=_("MAICA 后端服务器子模组"),
         version=maica_sv_ver,
         settings_pane="maica_server_setting_pane",
-        dependencies={"MAICA Blessland":("1.6.0", "1.6.99")},
+        dependencies={"MAICA Blessland":("1.7.0", "1.7.99")},
     )
 init -989 python:
     if store.mas_submod_utils.isSubmodInstalled("Submod Updater Plugin"):
