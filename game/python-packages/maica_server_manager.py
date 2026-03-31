@@ -30,7 +30,7 @@ class MAICAManager(object):
 
         # Basic logging fallback
         self._log_messages = []
-        
+
         # Logging setup with version compatibility
         if logging:
             try:
@@ -41,9 +41,18 @@ class MAICAManager(object):
                 self.logger = logging.getLogger(__name__)
             except Exception:
                 self.logger = None
-        
+
         # Environment variables store
         self._env_vars = {}
+
+        # Create fs_storage folder
+        exe_dir = os.path.dirname(self.exe_path)
+        fs_storage_path = os.path.join(exe_dir, 'fs_storage')
+        if not os.path.exists(fs_storage_path):
+            try:
+                os.makedirs(fs_storage_path)
+            except Exception:
+                pass
     
     def __del__(self):
         """Automatically stop server when MAICAManager is deleted."""
