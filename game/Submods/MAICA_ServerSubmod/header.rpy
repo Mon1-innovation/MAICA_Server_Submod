@@ -1,5 +1,5 @@
 init -990 python:
-    maica_sv_ver = "1.4.3"
+    maica_sv_ver = "1.4.4"
     store.mas_submod_utils.Submod(
         author="P",
         name="MAICA Illuminator compact",
