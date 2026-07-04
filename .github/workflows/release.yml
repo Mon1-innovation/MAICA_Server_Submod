@@ -70,12 +70,20 @@ jobs:
         # Download mi-search Windows binary
         wget -O game/Submods/MAICA_ServerSubmod/bin/mi-serp-precompiled-binary-win.exe https://github.com/edgeinfinity1/mi-search-mcp/releases/latest/download/mi-serp-precompiled-binary-win.exe
 
-    - name: Extract backend version
+    - name: Extract backend compatibility metadata
       if: steps.check_release.outputs.create_release == 'true'
       id: backend_version
       run: |
         backend_ver=$(grep "MAICA_CURR_VERSION = " game/Submods/MAICA_ServerSubmod/env_basis | cut -d"'" -f2)
+        blessland_capv=$(grep "MAICA_BLESSLAND_CAPV = " game/Submods/MAICA_ServerSubmod/env_basis | cut -d"'" -f2)
+        if [ -z "$backend_ver" ] || [ -z "$blessland_capv" ]; then
+          echo "Failed to extract MAICA_CURR_VERSION or MAICA_BLESSLAND_CAPV from env_basis"
+          exit 1
+        fi
         echo "backend_version=$backend_ver" >> $GITHUB_OUTPUT
+        echo "backend_blessland_capv=$blessland_capv" >> $GITHUB_OUTPUT
+        echo "Backend version: $backend_ver"
+        echo "Backend-required Blessland minimum: $blessland_capv"
 
     - name: Get latest commits
       if: steps.check_release.outputs.create_release == 'true'
@@ -90,6 +98,39 @@ jobs:
           echo "EOF"
         } >> $GITHUB_OUTPUT
 
+    - name: Extract version constraints
+      if: steps.check_release.outputs.create_release == 'true'
+      id: version_constraints
+      run: |
+        min_ver=$(grep 'dependencies=' game/Submods/MAICA_ServerSubmod/header.rpy | grep -oP '\("[\d.]+",\s*"[\d.]+"\)' | cut -d'"' -f2)
+        max_ver=$(grep 'dependencies=' game/Submods/MAICA_ServerSubmod/header.rpy | grep -oP '\("[\d.]+",\s*"[\d.]+"\)' | cut -d'"' -f4)
+        blessland_capv="${{ steps.backend_version.outputs.backend_blessland_capv }}"
+
+        version_ge() { printf '%s\n%s' "$2" "$1" | sort -V -C; }
+        version_gt() { version_ge "$1" "$2" && [ "$1" != "$2" ]; }
+
+        if [ -z "$min_ver" ] || [ -z "$max_ver" ]; then
+          echo "Failed to extract MAICA Blessland version constraints from header.rpy"
+          exit 1
+        fi
+
+        if version_gt "$blessland_capv" "$max_ver"; then
+          echo "Backend requires MAICA Blessland >= $blessland_capv, but this submod supports at most $max_ver"
+          exit 1
+        fi
+
+        effective_min_ver="$min_ver"
+        if version_gt "$blessland_capv" "$min_ver"; then
+          effective_min_ver="$blessland_capv"
+        fi
+
+        echo "min_version=$min_ver" >> $GITHUB_OUTPUT
+        echo "max_version=$max_ver" >> $GITHUB_OUTPUT
+        echo "backend_blessland_capv=$blessland_capv" >> $GITHUB_OUTPUT
+        echo "effective_min_version=$effective_min_ver" >> $GITHUB_OUTPUT
+        echo "Submod Blessland constraints: $min_ver - $max_ver"
+        echo "Effective Blessland constraints: $effective_min_ver - $max_ver"
+
     - name: Create zip package
       if: steps.check_release.outputs.create_release == 'true'
       run: |
@@ -98,20 +139,10 @@ jobs:
           -x '.github*' \
           -x '*.git*'
 
-    - name: Extract version constraints
-      if: steps.check_release.outputs.create_release == 'true'
-      id: version_constraints
-      run: |
-        min_ver=$(grep 'dependencies=' game/Submods/MAICA_ServerSubmod/header.rpy | grep -oP '\("[\d.]+",\s*"[\d.]+"\)' | cut -d'"' -f2)
-        max_ver=$(grep 'dependencies=' game/Submods/MAICA_ServerSubmod/header.rpy | grep -oP '\("[\d.]+",\s*"[\d.]+"\)' | cut -d'"' -f4)
-        echo "min_version=$min_ver" >> $GITHUB_OUTPUT
-        echo "max_version=$max_ver" >> $GITHUB_OUTPUT
-        echo "Version constraints: $min_ver - $max_ver"
-
     - name: Download MAICA_ChatSubmod compatible release
       if: steps.check_release.outputs.create_release == 'true'
       run: |
-        min_ver="${{ steps.version_constraints.outputs.min_version }}"
+        min_ver="${{ steps.version_constraints.outputs.effective_min_version }}"
         max_ver="${{ steps.version_constraints.outputs.max_version }}"
 
         version_ge() { printf '%s\n%s' "$2" "$1" | sort -V -C; }
@@ -121,15 +152,16 @@ jobs:
           "https://api.github.com/repos/Mon1-innovation/MAICA_ChatSubmod/releases?per_page=50")
 
         found=false
-        echo "$releases" | jq -c '.[]' | while read -r release; do
+        while read -r release; do
           tag=$(echo "$release" | jq -r '.tag_name')
+          normalized_tag="${tag#v}"
 
-          if version_ge "$tag" "$min_ver" && version_le "$tag" "$max_ver"; then
+          if version_ge "$normalized_tag" "$min_ver" && version_le "$normalized_tag" "$max_ver"; then
             download_url=$(echo "$release" | jq -r '.assets[] | select(.name | test("MAICA_ChatSubmod-.*\\.zip")) | .browser_download_url' | head -1)
 
             if [ -n "$download_url" ]; then
               filename=$(basename "$download_url")
-              echo "Found compatible version $tag (constraints: $min_ver - $max_ver)"
+              echo "Found compatible version $tag (effective constraints: $min_ver - $max_ver)"
               echo "Downloading from: $download_url"
               wget -O "$filename" "$download_url"
               echo "Successfully downloaded: $filename"
@@ -137,10 +169,11 @@ jobs:
               break
             fi
           fi
-        done
+        done < <(echo "$releases" | jq -c '.[]')
 
         if [ "$found" = false ]; then
-          echo "Warning: No compatible MAICA_ChatSubmod release found within version constraints ($min_ver - $max_ver)"
+          echo "No compatible MAICA_ChatSubmod release found within effective version constraints ($min_ver - $max_ver)"
+          exit 1
         fi
 
     - name: Create Release
@@ -151,6 +184,10 @@ jobs:
         body: |
           ## Backend Version
           This release uses backend version: **${{ steps.backend_version.outputs.backend_version }}**
+
+          ## MAICA Blessland Compatibility
+          Backend-required Blessland minimum: **${{ steps.version_constraints.outputs.backend_blessland_capv }}**
+          Packaged Blessland search range: **${{ steps.version_constraints.outputs.effective_min_version }} - ${{ steps.version_constraints.outputs.max_version }}**
 
           ## Latest Commits
           ```
