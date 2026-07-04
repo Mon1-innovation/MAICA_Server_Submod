@@ -172,7 +172,7 @@ init -5 python:
         maicasv.set_env('MAICA_MFOCUS_NODE', 'HGX610-biohazard-edition')
         maicasv.set_env('MAICA_ALT_TOOLCALL', '1')
         maicasv.set_env('MAICA_IS_REAL_ENV', '1')
-
+        maicasv.set_env('MAICA_SERVICE_ONLY', '1')
         store.mas_submod_utils.getAndRunFunctions("maica_update_key")
 
 init 500 python:
